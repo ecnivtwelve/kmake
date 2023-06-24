@@ -1,7 +1,21 @@
-![image](https://github.com/ecnivtwelve/kmake/assets/32978709/6d8c8fe2-b40f-440d-a741-ff7aad818331#gh-light-mode-only)
-![image](https://github.com/ecnivtwelve/kmake/assets/32978709/fe64994b-59f8-4abf-96a9-b87664e2ddcc#gh-dark-mode-only)
-Introducing a new way to make and preview lyrics, right in your web browser.
-# 
+<div align="center">
+  <a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="https://github.com/ecnivtwelve/kmake/assets/32978709/89fff204-086b-41a4-9de2-c08458f4f2b5" alt="Logo" width="80" height="80">
+  </a>
+
+  <h3 align="center">kmake - online JSON lyrics maker</h3>
+
+  <p align="center">
+    Introducing a new way to make and preview lyrics, right in your web browser.
+    <br />
+    <a href="kmake.vincelinise.com"><strong>Go on kmake.vincelinise.com »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/ecnivtwelve/kmake/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/ecnivtwelve/kmake/issues">Request Feature</a>
+  </p>
+</div>
 
 ## Features
 - 🎤 Sync lyrics to your music easily in your web browser
