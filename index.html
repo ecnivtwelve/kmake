@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>kmake - online JSON lyrics generator</title>
+        <meta name="description" content="Introducing a new way to make and preview lyrics, right in your web browser.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="shortcut icon" href="/assets/kmake-icon.png" type="image/png">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="manifest" href="/manifest.webmanifest">
+        <meta property="og:title" content="kmake - online JSON lyrics generator" />
+        <meta property="og:description" content="Introducing a new way to make and preview lyrics, right in your web browser." />
+        <meta property="og:site_name" content="kmake" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://kmake.vincelinise.me" />
+        <meta property="og:image" content="/images/banner.jpg" />
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <div id="loading">
+            <div class="loading-content">
+                <svg class="circular" height="50" width="50">
+                    <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="6" stroke-miterlimit="10" />
+                </svg>
+                <p class="loadingText">Loading the most amazing JSON lyrics maker...</p>
+            </div>
+        </div>
+
+        <div id="header">
+            <div class="header-content">
+                <img src="/assets/kmake-logo.png" class="logo"/>
+
+                <div class="buttons-actions">
+                    <button onclick="reset()">New</button>
+                    <button onclick="importJSON()">Import</button>
+                    <button onclick="exportJSON()">Export</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="app">
+            <div class="part part-left">
+                <div class="inner-part inner-music">
+                    <div class="inner-part-title">
+                        <p>Music</p>
+                    </div>
+                    <div class="inner-part-buttons buttons-top">
+                        <button onclick="importSong()" id="lyrics-button">Import</button>
+                        <button onclick="playPause()" id="playpause-button">Play/Pause <span>(Space)</span></button>
+                        <button onclick="reset()" id="lyrics-button">Reset</button>
+                    </div>
+                    <div class="inner-part-content">
+                        <div class="music_data">
+                            <img id="music-album-art" />
+                            <div class="music-data-text">
+                                <p id="music-title"></p>
+                                <p id="music-artist"></p>
+                                <p id="music-album"></p>
+                            </div>
+                        </div>
+                        <input type="file" id="music-input"/>
+                    </div>
+                    <audio id="music-player" controls></audio>
+                </div>
+                <div class="inner-part">
+                    <div class="inner-part-title">
+                        <p>Lyrics</p>
+                    </div>
+                    <div class="inner-part-buttons buttons-top">
+                        <button onclick="importJSON()" id="lyrics-button">Import</button>
+                        <button onclick="parseLyrics()" id="lyrics-button">Parse</button>
+                    </div>
+                    <textarea oninput="parseLyrics()" class="inner-part-content" id="lyrics-input" placeholder="Paste your lyrics or paste 2 times your JSON content."></textarea>
+                </div>
+            </div>
+            <div class="part">
+                <div class="inner-part">
+                    <div class="inner-part-title">
+                        <p>Sync</p>
+                    </div>
+                    <div class="inner-part-buttons buttons-top">
+                        <button onclick="nextWord()" id="nextword-button">Next word <span>(Space)</span></button>
+                        <button onclick="exportJSON()" id="json-button">Export as JSON</button>
+                        <button id="preview-mode" onclick="previewToggle()" id="json-button">Preview mode</button>
+                    </div>
+                    <div id="lyrics-content" class="inner-part-content">
+
+                    </div>
+                </div>
+            </div>
+            <div class="part part-right">
+                <div class="inner-part">
+                    <div class="inner-part-title">
+                        <p>Selected word</p>
+                    </div>
+                    <div class="inner-part-buttons buttons-top">
+                        <button onclick="unselect()">Unselect word</button>
+                    </div>
+                    <div class="inner-part-content properties">
+                        <div class="properties-item">
+                            <p class="properties-title">Word</p>
+                            <div class="properties-content">
+                                <p id="properties-word"></p>
+                            </div>
+                        </div>
+                        <div class="properties-item">
+                            <p class="properties-title">Start (ms)</p>
+                            <div class="properties-content">
+                                <input type="number" id="properties-start" value="0"/>
+                            </div>
+                        </div>
+                        <div class="properties-item">
+                            <p class="properties-title">Length (ms)</p>
+                            <div class="properties-content">
+                                <input type="number" id="properties-length" value="0"/>
+                            </div>
+                        </div>
+                        <div class="properties-item">
+                            <p class="properties-title">Preview</p>
+                            <div class="properties-content">
+                                <button id="properties-preview">Play</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="inner-part part-about">
+                    <div class="inner-part-title">
+                        <p>About this app</p>
+                    </div>
+                    <div class="inner-part-content">
+                        <img src="/assets/kmake-logo.png" class="logo"/>
+
+                        <p>version 0.0.2</p>
+                        <p>made by ecnivtwelve</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+        <script src="js/app.js" async defer></script>
+    </body>
+</html>
