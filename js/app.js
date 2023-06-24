@@ -38,14 +38,8 @@ musicInput.addEventListener('change', function() {
     // remove extension from filename
     filename = file.name.split('.').slice(0, -1).join('.');
 
-    if(!importedJSON) {
-        currentLyrics = [];
-    }
-
     jsmediatags.read(file, {
         onSuccess: function(tag) {
-            console.log(tag)
-
             document.getElementById('music-title').innerText = tag.tags.title;
             document.getElementById('music-artist').innerText = tag.tags.artist;
             document.getElementById('music-album').innerText = tag.tags.album;
@@ -58,12 +52,15 @@ musicInput.addEventListener('change', function() {
             document.getElementById('music-album-art').src = 'data:' + format + ';base64,' + base64String
         },
         onError: function(error) {
-            console.log(error)
+            console.error(error)
         }
     })  
 
-    lastWordTime = 0;
-    currentWordIndex = 0;
+    if(!importedJSON) {
+        currentLyrics = [];
+        lastWordTime = 0;
+        currentWordIndex = 0;
+    }
 });
 
 // on play, reset goBackIndex
@@ -113,16 +110,75 @@ function importJSON() {
     input.type = 'file';
     input.click();
 
+    importedJSON = true;
+
     input.addEventListener('change', function() {
         const file = this.files[0];
         const reader = new FileReader();
         reader.readAsText(file, 'UTF-8');
         reader.onload = function(evt) {
             const json = JSON.parse(evt.target.result);
-            lyricsInput.value = JSON.stringify(json);
-            parseLyrics();
-            lyricsInput.value = JSON.stringify(json);
-            parseLyrics();
+
+            // clear lyricsContent
+            lyricsContent.innerHTML = '';
+            
+            // for each word, add a <p> when isLineEnding is 1
+            json.forEach(word => {
+                if(word.isLineEnding === 1) {
+                    const p = document.createElement('p');
+                    p.classList.add('lyrics-line');
+                    lyricsContent.appendChild(p);
+                }
+            });
+
+            // for each word, add a <span> tag in the right <p> tag
+            let isLineEndingCounter = 0;
+            json.forEach(word => {
+                const p = document.querySelectorAll('.lyrics-line')[isLineEndingCounter];
+                const span = document.createElement('span');
+                span.classList.add('lyrics-word');
+                span.innerText = word.text + ' ';
+                p.appendChild(span);
+
+                if(word.isLineEnding === 1) {
+                    isLineEndingCounter++;
+                }
+            });
+
+            // for each word, set id to word-<index>
+            document.querySelectorAll('.lyrics-word').forEach(word => {
+                const index = Array.from(document.querySelectorAll('.lyrics-word')).indexOf(word);
+                word.id = 'word-' + index.toString();
+                
+                try {
+                    word.style.setProperty('--duration', json[index].duration + 'ms');
+                }
+                catch(error) {
+                    console.error(error);
+                }
+            });
+
+            // set currentLyrics to json
+            for(let i = 0; i < json.length; i++) {
+                const word = json[i];
+                currentLyrics.push(word);
+            }
+
+            // replace element in currentLyrics with element from lyricsContent
+            currentLyrics.forEach(word => {
+                const index = currentLyrics.indexOf(word);
+                const element = document.getElementById('word-' + index.toString());
+                word.element = element;
+            });
+
+            // set all words to done-word
+            const words = document.querySelectorAll('.lyrics-word');
+            words.forEach(word => {
+                word.classList.add('done-word');
+            });
+
+            // set currentWordIndex to last word
+            currentWordIndex = currentLyrics.length - 1;
         }
     });
 }
@@ -135,27 +191,6 @@ function parseLyrics() {
     let jsonText = null;
 
     lyricsContent.innerHTML = '';
-
-    // check if lyricsInput.value is JSON
-    try {
-        const json = JSON.parse(lyricsInput.value);
-        if(Array.isArray(json)) {
-            lyricsContent.innerHTML = '';
-            jsonText = json;
-            importedJSON = true;
-            // set lyricsInput.value to lyrics
-            lyricsInput.value = '';
-            currentLyrics.forEach(word => {
-                lyricsInput.value += word.text;
-
-                if(word.isLineEnding) {
-                    lyricsInput.value += '\n';
-                }
-            });
-        }
-    } catch (error) {
-        
-    }
 
     // for each line, add a <p> tag in the lyrics-content div
     const lines = lyricsInput.value.split('\n');
@@ -180,40 +215,6 @@ function parseLyrics() {
         });
         lyricsContent.appendChild(p);
     });
-
-    if(jsonText) {
-        // for each word, set id to word-<index>
-        document.querySelectorAll('.lyrics-word').forEach(word => {
-            const index = Array.from(document.querySelectorAll('.lyrics-word')).indexOf(word);
-            word.id = 'word-' + index.toString();
-            
-            try {
-                word.style.setProperty('--duration', jsonText[index].duration + 'ms');
-            }
-            catch(error) {
-                console.log(error);
-            }
-        });
-
-        // set currentLyrics to jsonText
-        for(let i = 0; i < jsonText.length; i++) {
-            const word = jsonText[i];
-            currentLyrics.push(word);
-        }
-
-        // replace element in currentLyrics with element from lyricsContent
-        currentLyrics.forEach(word => {
-            const index = currentLyrics.indexOf(word);
-            const element = document.getElementById('word-' + index.toString());
-            word.element = element;
-        });
-
-        // set all words to done-word
-        const words = document.querySelectorAll('.lyrics-word');
-        words.forEach(word => {
-            word.classList.add('done-word');
-        });
-    }
 }
 
 // next word
@@ -359,26 +360,30 @@ function exportJSON() {
     a.click();
 }
 
-let played_word = "";
+let played_word = '';
 
 // playback
 setInterval(() => {
+    // TODO : opti
+
     const time = musicPlayer.currentTime * 1000;
-
-    let low = 0;
-    let high = currentLyrics.length - 1;
+    
+    // find the word next to the word that is currently playing
     let currentWord = null;
-
-    while (low <= high) {
-        const mid = Math.floor((low + high) / 2);
-        const word = currentLyrics[mid];
-
-        if (word.time <= time) {
-            currentWord = word;
-            low = mid + 1;
-        } else {
-            high = mid - 1;
+    for(let i = 0; i < currentLyrics.length; i++) {
+        const word = currentLyrics[i];
+        if(word.time > time) {
+            currentWord = currentLyrics[i-1];
+            break;
         }
+    }
+
+    if(document.querySelectorAll('.playing-word').length > 0) {
+        document.querySelector('.playing-word').classList.remove('playing-word');
+    }
+
+    if(currentWord) {
+        currentWord.element.classList.add('playing-word');
     }
 
     if (currentWord && currentWord.text === played_word) {
@@ -387,16 +392,13 @@ setInterval(() => {
         return;
     } else {
         played_word = currentWord.text;
-        console.log(currentWord);
     }
 
-    const playingWord = document.querySelector('.playing-word');
-    if (playingWord !== null) {
-        playingWord.classList.remove('playing-word');
+    if(!currentWord) {
+        return;
     }
 
-    currentWord.element.classList.add('playing-word');
-
+    // add past-word class to all words before currentWord
     const allWords = Array.from(document.querySelectorAll('.lyrics-word'));
     const currentIndex = allWords.indexOf(currentWord.element);
 
@@ -455,8 +457,6 @@ document.addEventListener('click', function(event) {
 function openWord(wordIndex) {
     const word = currentLyrics[wordIndex];
     selectedWordIndex = wordIndex;
-
-    console.log(word);
 
     document.querySelectorAll('.opened-word').forEach(word => {
         word.classList.remove('opened-word');
