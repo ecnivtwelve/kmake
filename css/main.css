@@ -504,6 +504,10 @@ button.enabled {
     animation: word-playing var(--duration) linear forwards;
 }
 
+#lyrics-content.preview.paused .playing-word {
+    animation-play-state: paused !important;
+}
+
 @keyframes word-playing {
     0% {
         background-position: 100% 50%;

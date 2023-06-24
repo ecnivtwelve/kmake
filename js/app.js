@@ -366,6 +366,13 @@ let played_word = '';
 setInterval(() => {
     // TODO : opti
 
+    if(musicPlayer.paused) {
+        document.getElementById('lyrics-content').classList.add('paused');
+    }
+    else {
+        document.getElementById('lyrics-content').classList.remove('paused');
+    }
+
     const time = musicPlayer.currentTime * 1000;
     
     // find the word next to the word that is currently playing
