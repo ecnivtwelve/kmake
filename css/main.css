@@ -451,7 +451,7 @@ button.enabled {
     top: calc(0px + var(--offset-y));
     left: calc(0px + var(--offset-x));
 
-    animation: playing-line 200ms ease-out;
+    animation: playing-line 200ms linear;
 }
 
 @keyframes playing-line {
@@ -476,17 +476,15 @@ button.enabled {
     left: calc(0px + var(--offset-x));
 
     opacity: 0;
-    animation: next-line 200ms 100ms ease-out forwards;
+    animation: next-line 200ms 100ms linear forwards;
 }
 
 @keyframes next-line {
     from {
         opacity: 0;
-        top: calc(60px + var(--offset-y));
     }
     to {
         opacity: 1;
-        top: calc(30px + var(--offset-y));
     }
 }
 

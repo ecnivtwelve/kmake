@@ -359,56 +359,64 @@ function exportJSON() {
     a.click();
 }
 
+let played_word = "";
+
 // playback
 setInterval(() => {
     const time = musicPlayer.currentTime * 1000;
-    
-    // find the word next to the word that is currently playing
+
+    let low = 0;
+    let high = currentLyrics.length - 1;
     let currentWord = null;
-    for(let i = 0; i < currentLyrics.length; i++) {
-        const word = currentLyrics[i];
-        if(word.time > time) {
-            currentWord = currentLyrics[i-1];
-            break;
+
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        const word = currentLyrics[mid];
+
+        if (word.time <= time) {
+            currentWord = word;
+            low = mid + 1;
+        } else {
+            high = mid - 1;
         }
     }
 
-    if(document.querySelectorAll('.playing-word').length > 0) {
-        document.querySelector('.playing-word').classList.remove('playing-word');
+    if (currentWord && currentWord.text === played_word) {
+        return;
+    } else if (!currentWord) {
+        return;
+    } else {
+        played_word = currentWord.text;
+        console.log(currentWord);
     }
 
-    if(!currentWord) {
-        return;
+    const playingWord = document.querySelector('.playing-word');
+    if (playingWord !== null) {
+        playingWord.classList.remove('playing-word');
     }
-    
+
     currentWord.element.classList.add('playing-word');
 
-    // add past-word class to all words before currentWord
-    const allWords = document.querySelectorAll('.lyrics-word');
-    allWords.forEach(word => {
-        if(Array.from(allWords).indexOf(word) < Array.from(allWords).indexOf(currentWord.element)) {
-            word.classList.add('past-word');
-        } else {
-            word.classList.remove('past-word');
-        }
+    const allWords = Array.from(document.querySelectorAll('.lyrics-word'));
+    const currentIndex = allWords.indexOf(currentWord.element);
+
+    allWords.forEach((word, index) => {
+        word.classList.toggle('past-word', index < currentIndex);
     });
 
-    // find .lyrics-line that contains currentWord
     document.querySelectorAll('.lyrics-line').forEach(line => {
-        line.classList.remove('playing-line');
-        line.classList.remove('next-playing-line');
+        line.classList.remove('playing-line', 'next-playing-line');
     });
 
     const lyricsLine = currentWord.element.closest('.lyrics-line');
     lyricsLine.classList.add('playing-line');
     lyricsLine.classList.remove('next-playing-line');
 
-    // find next .lyrics-line
     const nextLyricsLine = lyricsLine.nextSibling;
-    if(nextLyricsLine) {
+    if (nextLyricsLine !== null) {
         nextLyricsLine.classList.add('next-playing-line');
     }
-}, 150);
+}, 30);
 
 // on arrow left, go back to last word and on arrow right, go to next word
 document.addEventListener('keydown', function(event) {
