@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="https://github.com/ecnivtwelve/kmake/assets/32978709/89fff204-086b-41a4-9de2-c08458f4f2b5" alt="Logo" width="80" height="80">
+    <img src="https://i.ibb.co/JjmG6T1/image.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">kmake - online JSON lyrics maker</h3>
@@ -24,4 +24,4 @@
 - 💿 Export and import your lyrics as a JSON file
 
 ## Screenshots
-![Capture d’écran 2023-06-24 à 22 31 34](https://github.com/ecnivtwelve/kmake/assets/32978709/2c516260-29c3-4b5d-aff7-47e8015ad3b8)
+![Capture d’écran 2023-06-24 à 22 31 34](https://i.ibb.co/0GQpSTx/Capture-d-e-cran-2023-06-24-a-22-31-34.png)
