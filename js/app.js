@@ -360,6 +360,71 @@ function exportJSON() {
     a.click();
 }
 
+function exportLRC() {
+    let lrcContent = '';
+
+    let currentPhraseTime = '';
+    let currentPhrase = '';
+
+    currentLyrics.forEach((word, index) => {
+        if (index === 0 || currentLyrics[index - 1].isLineEnding === 1) {
+            if (currentPhrase !== '') {
+                lrcContent += '[' + currentPhraseTime + ']' + currentPhrase.trim() + '\n';
+            }
+            currentPhraseTime = msToTime(word.time);
+            currentPhrase = word.text;
+        } else {
+            currentPhrase += word.text;
+        }
+    });
+
+    lrcContent += '[' + currentPhraseTime + ']' + currentPhrase.trim() + '\n';
+
+    const formattedContent = lrcContent.trim();
+    const blob = new Blob([formattedContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download = filename + '.lrc';
+    a.click();
+}
+
+
+function exportELRC() {
+    let lrcContent = '';
+
+    currentLyrics.forEach((word, index) => {
+        if (index === 0 || currentLyrics[index - 1].isLineEnding === 1) {
+            lrcContent += '\n' + '[' + msToTime(word.time) + ']' + word.text;
+        }
+        else {
+            lrcContent += ' <' + msToTime(word.time) + '>' + word.text;
+        }
+    });
+
+    const formattedContent = lrcContent.trim();
+    const blob = new Blob([formattedContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download = filename + '.lrc';
+    a.click();
+}
+
+function msToTime(duration) {
+    let milliseconds = parseInt((duration%1000)/10);
+    let seconds = parseInt((duration/1000)%60);
+    let minutes = parseInt((duration/(1000*60))%60);
+
+    milliseconds = (milliseconds < 10) ? '0' + milliseconds : milliseconds;
+    seconds = (seconds < 10) ? '0' + seconds : seconds;
+    minutes = (minutes < 10) ? '0' + minutes : minutes;
+
+    return minutes + ':' + seconds + '.' + milliseconds;
+}
+
 let played_word = '';
 
 // playback
