@@ -104,6 +104,7 @@ body {
     padding: 10px;
 
     height: calc(100vh - 10px * 2);
+    overflow: hidden;
 }
 
 .part-left:not(:has(> *)) {
@@ -391,6 +392,9 @@ button.enabled {
 #lyrics-content {
     font-size: 1.5em;
     scroll-behavior: smooth;
+
+    display: flex;
+    flex-direction: column;
 }
 
 #lyrics-content * {
@@ -411,6 +415,8 @@ button.enabled {
 .lyrics-line {
     display: flex;
     gap: 5px !important;
+
+    flex-wrap: wrap;
 }
 
 .lyrics-word.lyrics-space {
