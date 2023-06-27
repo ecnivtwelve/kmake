@@ -127,6 +127,15 @@ body {
     flex-direction: column;
 }
 
+.inner-part-ghost {
+    border: 1px dashed #ffffff67;
+    opacity: 0.25;
+}
+
+.inner-part-drag {
+    border: 1px dashed #fff;
+}
+
 .inner-part-title {
     width: calc(100% - 12px * 2);
     min-height: 30px;

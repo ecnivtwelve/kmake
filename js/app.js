@@ -1,109 +1,85 @@
+// imports
 const jsmediatags = window.jsmediatags
 
-let currentLyrics = [];
-let currentWordIndex = 0;
-let goBackIndex = 0;
-let importedJSON = false;
-let filename = '';
+// global variables
+let currentLyrics = [] // (final JSON) -> array of lyrics
+let currentWordIndex = 0; // index of the currently recorded word
+let goBackIndex = 0; // index of the word to go back to (arrow keys)
+let importedJSON = false; // if the lyrics have been imported from a JSON file
+let filename = ''; // name of the file
+let selectedWordIndex = -1; // index of the selected word
+let played_word = ''; // word that is currently being played
 
+// dom elements
+const elem_part_sortable = document.getElementsByClassName('part');
+const elem_musicInput = document.getElementById('music-input');
+const elem_musicPlayer = document.getElementById('music-player');
+const elem_lyricsInput = document.getElementById('lyrics-input');
+const elem_lyricsContent = document.getElementById('lyrics-content');
+
+// sortable
+for (let i = 0; i < elem_part_sortable.length; i++) {
+    var sortable = Sortable.create(elem_part_sortable[i], {
+        group: "part-sortable",
+        handle: ".inner-part-title",
+        animation: 150,
+        filter: ".ignore-elements",
+        ghostClass: "inner-part-ghost",
+        chosenClass: "inner-part-chosen",
+        dragClass: "inner-part-drag",
+        store: {
+            set: function (sortable) {
+                var order = sortable.toArray();
+                localStorage.setItem(sortable.options.group.name, order.join('|'));
+            },
+            get: function (sortable) {
+                var order = localStorage.getItem(sortable.options.group.name);
+			    return order ? order.split('|') : [];
+            }
+        }
+    });
+}
+
+// tools
+function msToTime(duration) {
+    let milliseconds = parseInt((duration%1000)/10);
+    let seconds = parseInt((duration/1000)%60);
+    let minutes = parseInt((duration/(1000*60))%60);
+
+    milliseconds = (milliseconds < 10) ? '0' + milliseconds : milliseconds;
+    seconds = (seconds < 10) ? '0' + seconds : seconds;
+    minutes = (minutes < 10) ? '0' + minutes : minutes;
+
+    return minutes + ':' + seconds + '.' + milliseconds;
+}
+
+// functionnal functions
 function reset() {
+    // reset global variables
     currentLyrics = [];
     currentWordIndex = 0;
     goBackIndex = 0;
     importedJSON = false;
-    musicPlayer.src = '';
-    musicInput.value = '';
-    lyricsInput.value = '';
     filename = '';
-    lyricsContent.innerHTML = '';
+    selectedWordIndex = -1;
+    played_word = '';
+
+    // reset dom elements
+    elem_musicPlayer.src = '';
+    elem_musicInput.value = '';
+    elem_lyricsInput.value = '';
+    elem_lyricsContent.innerHTML = '';
+
+    // reset music info
     document.getElementById('music-title').innerText = '';
     document.getElementById('music-artist').innerText = '';
     document.getElementById('music-album').innerText = '';
     document.getElementById('music-album-art').src = null;
 }
 
-// load a song
-const musicInput = document.getElementById('music-input');
-const musicPlayer = document.getElementById('music-player');
-
 function importSong() {
-    musicInput.click();
+    elem_musicInput.click();
 }
-
-musicInput.addEventListener('change', function() {
-    const file = this.files[0];
-    const objectURL = URL.createObjectURL(file);
-    musicPlayer.src = objectURL;
-
-    // remove extension from filename
-    filename = file.name.split('.').slice(0, -1).join('.');
-
-    jsmediatags.read(file, {
-        onSuccess: function(tag) {
-            document.getElementById('music-title').innerText = tag.tags.title;
-            document.getElementById('music-artist').innerText = tag.tags.artist;
-            document.getElementById('music-album').innerText = tag.tags.album;
-
-            // Array buffer to base64
-            const data = tag.tags.picture.data
-            const format = tag.tags.picture.format
-            const base64String = btoa(String.fromCharCode.apply(null, data))
-
-            document.getElementById('music-album-art').src = 'data:' + format + ';base64,' + base64String
-        },
-        onError: function(error) {
-            console.error(error)
-        }
-    })  
-
-    if(!importedJSON) {
-        currentLyrics = [];
-        lastWordTime = 0;
-        currentWordIndex = 0;
-    }
-});
-
-// on play, reset goBackIndex
-musicPlayer.addEventListener('play', function() {
-    goBackIndex = 0;
-});
-
-function playPause() {
-    const playPauseButton = document.getElementById('playpause-button');
-    playPauseButton.classList.add('enabled');
-    setTimeout(() => {
-        playPauseButton.classList.remove('enabled');
-    }, 50);
-
-    if(musicPlayer.paused) {
-        musicPlayer.play();
-    } else {
-        musicPlayer.pause();
-    }
-}
-
-// shortcut spacebar to play/pause
-document.addEventListener('keydown', function(event) {
-    // check if we're in the lyrics input
-    if(document.activeElement === lyricsInput) {
-        return;
-    }
-    if(event.keyCode === 32) {
-        // if audioplayer is in focus, don't play/pause
-        if(document.activeElement === musicPlayer) {
-            return;
-        }
-
-        playPause();
-
-        // prevent spacebar from scrolling down
-        event.preventDefault();
-    }
-});
-
-// parse lyrics
-const lyricsInput = document.getElementById('lyrics-input');
-const lyricsContent = document.getElementById('lyrics-content');
 
 function importJSON() {
     var input = document.createElement('input');
@@ -119,15 +95,15 @@ function importJSON() {
         reader.onload = function(evt) {
             const json = JSON.parse(evt.target.result);
 
-            // clear lyricsContent
-            lyricsContent.innerHTML = '';
+            // clear elem_lyricsContent
+            elem_lyricsContent.innerHTML = '';
             
             // for each word, add a <p> when isLineEnding is 1
             json.forEach(word => {
                 if(word.isLineEnding === 1) {
                     const p = document.createElement('p');
                     p.classList.add('lyrics-line');
-                    lyricsContent.appendChild(p);
+                    elem_lyricsContent.appendChild(p);
                 }
             });
 
@@ -164,7 +140,7 @@ function importJSON() {
                 currentLyrics.push(word);
             }
 
-            // replace element in currentLyrics with element from lyricsContent
+            // replace element in currentLyrics with element from elem_lyricsContent
             currentLyrics.forEach(word => {
                 const index = currentLyrics.indexOf(word);
                 const element = document.getElementById('word-' + index.toString());
@@ -184,16 +160,16 @@ function importJSON() {
 }
 
 function parseLyrics() {
-    if (lyricsInput.value.trim() === '') {
+    if (elem_lyricsInput.value.trim() === '') {
         return;
     }
 
     let jsonText = null;
 
-    lyricsContent.innerHTML = '';
+    elem_lyricsContent.innerHTML = '';
 
     // for each line, add a <p> tag in the lyrics-content div
-    const lines = lyricsInput.value.split('\n');
+    const lines = elem_lyricsInput.value.split('\n');
     lines.forEach(line => {
         const p = document.createElement('p');
         p.classList.add('lyrics-line');
@@ -213,11 +189,10 @@ function parseLyrics() {
             span.innerText = word + ' ';
             p.appendChild(span);
         });
-        lyricsContent.appendChild(p);
+        elem_lyricsContent.appendChild(p);
     });
 }
 
-// next word
 function nextWord() {
     const NextWordButton = document.getElementById('nextword-button');
 
@@ -226,8 +201,8 @@ function nextWord() {
         NextWordButton.classList.remove('enabled');
     }, 50);
 
-    // get time of musicPlayer in milliseconds
-    const time = musicPlayer.currentTime * 1000;
+    // get time of elem_musicPlayer in milliseconds
+    const time = elem_musicPlayer.currentTime * 1000;
 
 
     let currentWord = document.querySelectorAll('.lyrics-word')[currentWordIndex];
@@ -298,8 +273,8 @@ function nextWord() {
     currentWordIndex += 1;
 
     // scroll to next word
-    const lyricsContent = document.getElementById('lyrics-content');
-    lyricsContent.scrollTop = currentWord.offsetTop - lyricsContent.offsetTop - 100;
+    const elem_lyricsContent = document.getElementById('lyrics-content');
+    elem_lyricsContent.scrollTop = currentWord.offsetTop - elem_lyricsContent.offsetTop - 100;
 
     // if there is no next word, remove class current-word from last word
     if(!nextWord) {
@@ -310,20 +285,61 @@ function nextWord() {
     }
 }
 
-// when enter is pressed, call nextWord()
-document.addEventListener('keydown', function(event) {
-    // check if we're in the lyrics input
-    if(document.activeElement === lyricsInput) {
-        return;
-    }
-    if(event.keyCode === 13) {
-        // prevent default
-        event.preventDefault();
+function openWord(wordIndex) {
+    const word = currentLyrics[wordIndex];
+    selectedWordIndex = wordIndex;
 
-        nextWord();
-    }
-});
+    document.querySelectorAll('.opened-word').forEach(word => {
+        word.classList.remove('opened-word');
+    });
 
+    word.element.classList.add('opened-word');
+    document.getElementById('properties-word').innerText = word.text;
+    document.getElementById('properties-start').value = word.time;
+    document.getElementById('properties-length').value = word.duration;
+
+    // go to word
+    elem_musicPlayer.currentTime = word.time / 1000;
+}
+
+// UI functions
+function playPause() {
+    const playPauseButton = document.getElementById('playpause-button');
+    playPauseButton.classList.add('enabled');
+    setTimeout(() => {
+        playPauseButton.classList.remove('enabled');
+    }, 50);
+
+    if(elem_musicPlayer.paused) {
+        elem_musicPlayer.play();
+    } else {
+        elem_musicPlayer.pause();
+    }
+}
+
+function previewToggle() {
+    document.getElementById('lyrics-content').classList.toggle('preview');
+
+    if (document.querySelector('#preview-mode').innerHTML == 'Preview mode') {
+        document.querySelector('#preview-mode').innerHTML = 'Edit mode';
+    }
+    else {
+        document.querySelector('#preview-mode').innerHTML = 'Preview mode';
+    }
+}
+
+function unselect() {
+    selectedWordIndex = -1;
+    document.querySelectorAll('.opened-word').forEach(word => {
+        word.classList.remove('opened-word');
+    });
+
+    document.getElementById('properties-word').innerText = '';
+    document.getElementById('properties-start').value = 0;
+    document.getElementById('properties-length').value = 0;
+}
+
+// exports
 function exportJSON() {
     let exportedLyrics = currentLyrics;
 
@@ -393,7 +409,6 @@ function exportLRC() {
     a.click();
 }
 
-
 function exportELRC() {
     let lrcContent = '';
 
@@ -416,32 +431,32 @@ function exportELRC() {
     a.click();
 }
 
-function msToTime(duration) {
-    let milliseconds = parseInt((duration%1000)/10);
-    let seconds = parseInt((duration/1000)%60);
-    let minutes = parseInt((duration/(1000*60))%60);
+// shortcuts
+document.addEventListener('keydown', function(event) {
+    // check if we're in the lyrics input
+    if(document.activeElement === elem_lyricsInput) {
+        return;
+    }
+    if(event.keyCode === 13) {
+        // prevent default
+        event.preventDefault();
 
-    milliseconds = (milliseconds < 10) ? '0' + milliseconds : milliseconds;
-    seconds = (seconds < 10) ? '0' + seconds : seconds;
-    minutes = (minutes < 10) ? '0' + minutes : minutes;
-
-    return minutes + ':' + seconds + '.' + milliseconds;
-}
-
-let played_word = '';
+        nextWord();
+    }
+});
 
 // playback
 setInterval(() => {
     // TODO : opti
 
-    if(musicPlayer.paused) {
+    if(elem_musicPlayer.paused) {
         document.getElementById('lyrics-content').classList.add('paused');
     }
     else {
         document.getElementById('lyrics-content').classList.remove('paused');
     }
 
-    const time = musicPlayer.currentTime * 1000;
+    const time = elem_musicPlayer.currentTime * 1000;
     
     // find the word next to the word that is currently playing
     let currentWord = null;
@@ -495,6 +510,64 @@ setInterval(() => {
     }
 }, 30);
 
+// events
+elem_musicInput.addEventListener('change', function() {
+    const file = this.files[0];
+    const objectURL = URL.createObjectURL(file);
+    elem_musicPlayer.src = objectURL;
+
+    // remove extension from filename
+    filename = file.name.split('.').slice(0, -1).join('.');
+
+    jsmediatags.read(file, {
+        onSuccess: function(tag) {
+            document.getElementById('music-title').innerText = tag.tags.title;
+            document.getElementById('music-artist').innerText = tag.tags.artist;
+            document.getElementById('music-album').innerText = tag.tags.album;
+
+            // Array buffer to base64
+            const data = tag.tags.picture.data
+            const format = tag.tags.picture.format
+            const base64String = btoa(String.fromCharCode.apply(null, data))
+
+            document.getElementById('music-album-art').src = 'data:' + format + ';base64,' + base64String
+        },
+        onError: function(error) {
+            console.error(error)
+        }
+    })  
+
+    if(!importedJSON) {
+        currentLyrics = [];
+        lastWordTime = 0;
+        currentWordIndex = 0;
+    }
+});
+
+// on play, reset goBackIndex
+elem_musicPlayer.addEventListener('play', function() {
+    goBackIndex = 0;
+});
+
+// shortcut spacebar to play/pause
+document.addEventListener('keydown', function(event) {
+    // check if we're in the lyrics input
+    if(document.activeElement === elem_lyricsInput) {
+        return;
+    }
+    if(event.keyCode === 32) {
+        // if audioplayer is in focus, don't play/pause
+        if(document.activeElement === elem_musicPlayer) {
+            return;
+        }
+
+        playPause();
+
+        // prevent spacebar from scrolling down
+        event.preventDefault();
+    }
+});
+
 // on arrow left, go back to last word and on arrow right, go to next word
 document.addEventListener('keydown', function(event) {
     if(event.keyCode === 37) {
@@ -511,11 +584,9 @@ document.addEventListener('keydown', function(event) {
     // move to word
     if(event.keyCode === 37 || event.keyCode === 39) {
         let word = currentLyrics[currentWordIndex + goBackIndex];
-        musicPlayer.currentTime = word.time / 1000;
+        elem_musicPlayer.currentTime = word.time / 1000;
     }
 });
-
-let selectedWordIndex = -1;
 
 // on click on .lyrics-word
 document.addEventListener('click', function(event) {
@@ -529,24 +600,7 @@ document.addEventListener('click', function(event) {
     }
 });
 
-function openWord(wordIndex) {
-    const word = currentLyrics[wordIndex];
-    selectedWordIndex = wordIndex;
-
-    document.querySelectorAll('.opened-word').forEach(word => {
-        word.classList.remove('opened-word');
-    });
-
-    word.element.classList.add('opened-word');
-    document.getElementById('properties-word').innerText = word.text;
-    document.getElementById('properties-start').value = word.time;
-    document.getElementById('properties-length').value = word.duration;
-
-    // go to word
-    musicPlayer.currentTime = word.time / 1000;
-}
-
-// on properties-start change
+// properties change
 document.getElementById('properties-start').addEventListener('change', function(event) {
     if (selectedWordIndex === -1) {
         return;
@@ -554,7 +608,6 @@ document.getElementById('properties-start').addEventListener('change', function(
     currentLyrics[selectedWordIndex].time = parseInt(event.target.value);
 });
 
-// on properties-length change
 document.getElementById('properties-length').addEventListener('change', function(event) {
     if (selectedWordIndex === -1) {
         return;
@@ -581,39 +634,16 @@ document.getElementById('properties-length').addEventListener('change', function
     currentLyrics[selectedWordIndex].element.style.setProperty('--duration', currentLyrics[selectedWordIndex].duration + 'ms');
 });
 
-// on properties-preview click
 document.getElementById('properties-preview').addEventListener('click', function(event) {
     const word = currentLyrics[selectedWordIndex];
-    musicPlayer.currentTime = word.time / 1000;
-    musicPlayer.play();
+    elem_musicPlayer.currentTime = word.time / 1000;
+    elem_musicPlayer.play();
 
     // stop preview after duration
     setTimeout(() => {
-        musicPlayer.pause();
+        elem_musicPlayer.pause();
     }, word.duration);
 });
-
-function previewToggle() {
-    document.getElementById('lyrics-content').classList.toggle('preview');
-
-    if (document.querySelector('#preview-mode').innerHTML == 'Preview mode') {
-        document.querySelector('#preview-mode').innerHTML = 'Edit mode';
-    }
-    else {
-        document.querySelector('#preview-mode').innerHTML = 'Preview mode';
-    }
-}
-
-function unselect() {
-    selectedWordIndex = -1;
-    document.querySelectorAll('.opened-word').forEach(word => {
-        word.classList.remove('opened-word');
-    });
-
-    document.getElementById('properties-word').innerText = '';
-    document.getElementById('properties-start').value = 0;
-    document.getElementById('properties-length').value = 0;
-}
 
 // on dom fully loaded
 window.addEventListener('load', function() {
