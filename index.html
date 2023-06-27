@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
         <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/preview.css">
         <link rel="manifest" href="/manifest.webmanifest">
         <meta property="og:title" content="kmake - online JSON lyrics generator" />
         <meta property="og:description" content="Introducing a new way to make and preview lyrics, right in your web browser." />
@@ -97,7 +98,7 @@
 
                         <button id="preview-mode" onclick="previewToggle()" id="json-button">Preview mode</button>
                     </div>
-                    <div id="lyrics-content" class="inner-part-content">
+                    <div id="lyrics-content" data-theme="jd2014" class="inner-part-content">
 
                     </div>
                 </div>
@@ -137,6 +138,29 @@
                         </div>
                     </div>
                 </div>
+                <div class="inner-part part-preview">
+                    <div class="inner-part-title">
+                        <p>Preview mode</p>
+                    </div>
+                    <div class="inner-part-content properties">
+                        <div class="properties-item">
+                            <p class="properties-title">Enable preview mode</p>
+                            <div class="properties-content">
+                                <input type="checkbox" id="preview-checkbox" onchange="previewToggle()"/>
+                            </div>
+                        </div>
+                        <div class="properties-item">
+                            <p class="properties-title">Preview theme</p>
+                            <div class="properties-content">
+                                <select id="preview-theme">
+                                    <option value="jd2014">jd2014</option>
+                                    <option value="spotify">spotify</option>
+                                    <option value="karafun">karafun</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="inner-part part-about">
                     <div class="inner-part-title">
                         <p>About this app</p>
@@ -144,7 +168,7 @@
                     <div class="inner-part-content">
                         <img src="/assets/kmake-logo.png" class="logo"/>
 
-                        <p>version 0.0.3</p>
+                        <p>version 0.0.4</p>
                         <p>made by ecnivtwelve</p>
                     </div>
                 </div>

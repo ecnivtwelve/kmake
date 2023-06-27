@@ -114,12 +114,21 @@ function importJSON(files) {
             // clear elem_lyricsContent
             elem_lyricsContent.innerHTML = '';
             
+            inc = 0;
+
             // for each word, add a <p> when isLineEnding is 1
             json.forEach(word => {
                 if(word.isLineEnding === 1) {
                     const p = document.createElement('p');
                     p.classList.add('lyrics-line');
+                    if(inc % 2 === 0) {
+                        p.classList.add('even');
+                    }
+                    else {
+                        p.classList.add('odd');
+                    }
                     elem_lyricsContent.appendChild(p);
+                    inc++;
                 }
             });
 
@@ -189,11 +198,22 @@ function parseLyrics() {
 
     elem_lyricsContent.innerHTML = '';
 
+    let inc = 0;
+
     // for each line, add a <p> tag in the lyrics-content div
     const lines = elem_lyricsInput.value.split('\n');
     lines.forEach(line => {
         const p = document.createElement('p');
         p.classList.add('lyrics-line');
+
+        // if inc is even, add .even to the <p> tag, else add .odd
+        if(inc % 2 === 0) {
+            p.classList.add('even');
+        }
+        else {
+            p.classList.add('odd');
+        }
+
         // for each word, add a <span> tag in the <p> tag
         const words = line.split(' ');
         words.forEach(word => {
@@ -211,6 +231,8 @@ function parseLyrics() {
             p.appendChild(span);
         });
         elem_lyricsContent.appendChild(p);
+
+        inc++;
     });
 }
 
@@ -347,7 +369,16 @@ function previewToggle() {
     else {
         document.querySelector('#preview-mode').innerHTML = 'Preview mode';
     }
+
+    // preview-checkbox
+    const previewCheckbox = document.getElementById('preview-checkbox');
+    previewCheckbox.checked = document.getElementById('lyrics-content').classList.contains('preview');
 }
+
+document.getElementById('preview-theme').addEventListener('change', () => {
+    // change data-theme of lyrics-content
+    document.getElementById('lyrics-content').setAttribute('data-theme', document.getElementById('preview-theme').value);
+});
 
 function unselect() {
     selectedWordIndex = -1;
@@ -599,10 +630,40 @@ setInterval(() => {
     const lyricsLine = currentWord.element.closest('.lyrics-line');
     lyricsLine.classList.add('playing-line');
     lyricsLine.classList.remove('next-playing-line');
+    
+    document.querySelectorAll('.next-next-playing-line').forEach(line => {
+        line.classList.remove('next-next-playing-line');
+    });
+
+    document.querySelectorAll('.previous-playing-line').forEach(line => {
+        line.classList.remove('previous-playing-line');
+    });
 
     const nextLyricsLine = lyricsLine.nextSibling;
     if (nextLyricsLine !== null) {
         nextLyricsLine.classList.add('next-playing-line');
+    }
+
+    const nextNextLyricsLine = nextLyricsLine.nextSibling;
+    if (nextNextLyricsLine !== null) {
+        nextNextLyricsLine.classList.add('next-next-playing-line');
+    }
+
+    // get previous line
+    const previousLyricsLine = lyricsLine.previousSibling;
+    if (previousLyricsLine !== null) {
+        previousLyricsLine.classList.add('previous-playing-line');
+    }
+
+    // if preview, scroll to current line
+    if (document.getElementById('lyrics-content').classList.contains('preview')) {
+        const lyricsContent = document.getElementById('lyrics-content');
+       
+        const currentLine = document.querySelector('.playing-line');
+
+        const currentLineTop = currentLine.offsetTop;
+        
+        lyricsContent.scrollTop = currentLineTop - lyricsContent.clientHeight / 2 + 120;
     }
 }, 30);
 

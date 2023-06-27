@@ -1,0 +1,286 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&display=swap');
+
+#lyrics-content.preview {
+    background: #000;
+
+    position: relative;
+    pointer-events: none;
+
+    --offset-x: 10px;
+    --offset-y: 10px;
+}
+
+#lyrics-content.preview .lyrics-word {
+    color: #fff !important;
+    border: none;
+    background: none;
+}
+
+/* jd2014 */
+#lyrics-content.preview[data-theme="jd2014"] .lyrics-word {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#lyrics-content.preview[data-theme="jd2014"] .lyrics-word:hover {
+    border: 1px solid #ffffff00 !important;
+}
+
+#lyrics-content.preview[data-theme="jd2014"] .lyrics-line {
+    display: none;
+
+    width: calc(100% - 10px);
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#lyrics-content.preview[data-theme="jd2014"] .playing-line {
+    z-index: 999;
+    display: flex;
+
+    position: absolute;
+    top: calc(0px + var(--offset-y));
+    left: calc(0px + var(--offset-x));
+
+    animation: playing-line 200ms linear;
+}
+
+@keyframes playing-line {
+    from {
+        top: calc(30px + var(--offset-y));
+        opacity: 0.5;
+    }
+    to {
+        top: calc(0px + var(--offset-y));
+        opacity: 1;
+    }
+}
+
+#lyrics-content.preview[data-theme="jd2014"] .playing-line .done-word {
+    color: #fff;
+}
+
+#lyrics-content.preview[data-theme="jd2014"] .next-playing-line {
+    z-index: 0;
+    display: flex;
+
+    position: absolute;
+    top: calc(30px + var(--offset-y));
+    left: calc(0px + var(--offset-x));
+
+    opacity: 0;
+    animation: next-line 200ms 100ms linear forwards;
+
+}
+
+#lyrics-content.preview[data-theme="jd2014"] .next-playing-line .lyrics-word {
+    color: #ffffff72 !important;
+}
+
+@keyframes next-line {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+#lyrics-content.preview[data-theme="jd2014"] .past-word {
+    color: rgb(216, 44, 213) !important;
+}
+
+#lyrics-content.preview[data-theme="jd2014"] .playing-word {
+    /* text linear gradient */
+    background: linear-gradient(90deg, rgb(216, 44, 213) 50%, #fff 50%);
+    background-clip: text !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+
+    background-size: 200% 100% !important;
+
+    animation: word-playing var(--duration) linear forwards;
+}
+
+#lyrics-content.preview[data-theme="jd2014"].paused .playing-word {
+    animation-play-state: paused !important;
+}
+
+@keyframes word-playing {
+    0% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* spotify */
+#lyrics-content.preview[data-theme="spotify"] {
+    background: rgb(93, 20, 189);
+
+    gap: 14px;
+
+    padding-left: 24px;
+    padding-right: 24px;
+
+    width: calc(100% - 24px * 2);
+}
+
+#lyrics-content.preview[data-theme="spotify"] .lyrics-word {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 28px;
+}
+
+#lyrics-content.preview[data-theme="spotify"] .lyrics-line .lyrics-word {
+    color: #000 !important;
+}
+
+#lyrics-content.preview[data-theme="spotify"] .lyrics-line .past-word {
+    color: #fff !important;
+}
+
+#lyrics-content.preview[data-theme="spotify"] .playing-line .lyrics-word {
+    color: #ffffff50 !important;
+}
+
+#lyrics-content.preview[data-theme="spotify"] .playing-line .past-word, #lyrics-content.preview[data-theme="spotify"] .playing-line .playing-word {
+    color: #fff !important;
+}
+
+/* karafun */
+#lyrics-content.preview[data-theme="karafun"] {
+    --offset-x: 10px;
+    --offset-y: 40%;
+
+    background: linear-gradient(68deg, #662441, #432466, #244066);
+    background-size: 600% 600%;
+    animation: karaokeGradient 7s ease infinite;
+
+    overflow: hidden;
+}
+
+@keyframes karaokeGradient {
+    0%{background-position:72% 0%}
+    50%{background-position:29% 100%}
+    100%{background-position:72% 0%}
+}
+
+#lyrics-content.preview[data-theme="karafun"] .lyrics-word {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    font-size: 36px;
+
+    -webkit-text-stroke: 1px black;
+    -webkit-font-smoothing : antialiased;
+}
+
+#lyrics-content.preview[data-theme="karafun"] .lyrics-word:hover {
+    border: 1px solid #ffffff00 !important;
+}
+
+#lyrics-content.preview[data-theme="karafun"] .lyrics-line {
+    display: none;
+
+    width: calc(100% - 12px * 2);
+    overflow: visible;
+    white-space: nowrap;
+
+    text-align: center;
+    justify-content: center;
+
+    flex-wrap: nowrap;
+
+    -webkit-filter: drop-shadow(0px 0px 5px #ffffff80);
+}
+
+#lyrics-content.preview[data-theme="karafun"] .lyrics-line .lyrics-word {
+    -webkit-filter: drop-shadow(0px 1px 2px #00000050);
+}
+
+#lyrics-content.preview[data-theme="karafun"] .playing-line {
+    z-index: 999;
+    display: flex;
+
+    position: absolute;
+}
+
+@keyframes previous-line {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+#lyrics-content.preview[data-theme="karafun"] .playing-line .done-word {
+    color: #fff;
+}
+
+#lyrics-content.preview[data-theme="karafun"] .previous-playing-line {
+    z-index: 999;
+    display: flex;
+
+    position: absolute;
+
+    animation: previous-line 200ms 100ms linear forwards;
+}
+
+#lyrics-content.preview[data-theme="karafun"] .next-playing-line {
+    z-index: 0;
+    display: flex;
+
+    position: absolute;
+
+    opacity: 0;
+    animation: next-line 300ms 400ms linear forwards;
+}
+
+#lyrics-content.preview[data-theme="karafun"] .lyrics-line.odd {
+    top: calc(0px + var(--offset-y));
+    left: calc(0px + var(--offset-x));
+}
+
+#lyrics-content.preview[data-theme="karafun"] .lyrics-line.even {
+    top: calc(60px + var(--offset-y));
+    left: calc(0px + var(--offset-x));
+}
+
+
+@keyframes next-line {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+#lyrics-content.preview[data-theme="karafun"] .past-word {
+    color: rgb(237, 61, 234) !important;
+}
+
+#lyrics-content.preview[data-theme="karafun"] .playing-word {
+    /* text linear gradient */
+    background: linear-gradient(90deg, rgb(237, 61, 234) 50%, #fff 50%) ;
+    background-clip: text !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+
+    background-size: 200% 100% !important;
+
+    animation: word-playing var(--duration) linear forwards;
+}
+
+#lyrics-content.preview[data-theme="karafun"].paused .playing-word {
+    animation-play-state: paused !important;
+}
+
+@keyframes word-playing {
+    0% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
