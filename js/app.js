@@ -348,8 +348,11 @@ function exportJSON() {
         }
     });
 
+    // filter out empty words
+    const filteredLyrics = currentLyrics.filter(word => word.text !== '');
+
     // make pretty JSON
-    const json = JSON.stringify(currentLyrics, null, 4);
+    const json = JSON.stringify(filteredLyrics, null, 4);
 
     const blob = new Blob([json], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
