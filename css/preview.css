@@ -152,8 +152,8 @@
     --offset-x: 10px;
     --offset-y: 40%;
 
-    background: linear-gradient(68deg, #662441, #432466, #244066);
-    background-size: 600% 600%;
+    background: linear-gradient(84deg, #662441, #432466, #244066);
+    background-size: 450% 540%;
     animation: karaokeGradient 7s ease infinite;
 
     overflow: hidden;
@@ -270,6 +270,10 @@
     background-size: 200% 100% !important;
 
     animation: word-playing var(--duration) linear forwards;
+}
+
+#lyrics-content.preview[data-theme="karafun"].paused {
+    animation-play-state: paused !important;
 }
 
 #lyrics-content.preview[data-theme="karafun"].paused .playing-word {
