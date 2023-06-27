@@ -9,6 +9,7 @@ let importedJSON = false; // if the lyrics have been imported from a JSON file
 let filename = ''; // name of the file
 let selectedWordIndex = -1; // index of the selected word
 let played_word = ''; // word that is currently being played
+let music_file = null; // music file
 
 // dom elements
 const elem_part_sortable = document.getElementsByClassName('part');
@@ -16,6 +17,11 @@ const elem_musicInput = document.getElementById('music-input');
 const elem_musicPlayer = document.getElementById('music-player');
 const elem_lyricsInput = document.getElementById('lyrics-input');
 const elem_lyricsContent = document.getElementById('lyrics-content');
+
+// plyr
+const player = new Plyr(elem_musicPlayer, {
+    controls: ['play', 'progress', 'current-time', 'mute', 'settings'],
+});
 
 // sortable
 for (let i = 0; i < elem_part_sortable.length; i++) {
@@ -81,10 +87,13 @@ function importSong() {
     elem_musicInput.click();
 }
 
-function importJSON() {
+function importJSON(files) {
     var input = document.createElement('input');
     input.type = 'file';
-    input.click();
+
+    if(!files) {
+        input.click();
+    }
 
     importedJSON = true;
 
@@ -157,6 +166,11 @@ function importJSON() {
             currentWordIndex = currentLyrics.length - 1;
         }
     });
+
+    if(files) {
+        input.files = files;
+        input.dispatchEvent(new Event('change'));
+    }
 }
 
 function parseLyrics() {
@@ -340,7 +354,7 @@ function unselect() {
 }
 
 // exports
-function exportJSON() {
+function prepareJSON() {
     let exportedLyrics = currentLyrics;
 
     // add mussing lyrics with duration 0 and last time
@@ -371,15 +385,10 @@ function exportJSON() {
     const json = JSON.stringify(filteredLyrics, null, 4);
 
     const blob = new Blob([json], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-
-    a.href = url;
-    a.download = filename + '.json';
-    a.click();
+    return blob;
 }
 
-function exportLRC() {
+function prepareLRC() {
     let lrcContent = '';
 
     let currentPhraseTime = '';
@@ -401,15 +410,10 @@ function exportLRC() {
 
     const formattedContent = lrcContent.trim();
     const blob = new Blob([formattedContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-
-    a.href = url;
-    a.download = filename + '.lrc';
-    a.click();
+    return blob;
 }
 
-function exportELRC() {
+function prepareELRC() {
     let lrcContent = '';
 
     currentLyrics.forEach((word, index) => {
@@ -423,12 +427,95 @@ function exportELRC() {
 
     const formattedContent = lrcContent.trim();
     const blob = new Blob([formattedContent], { type: 'text/plain' });
+    return blob;
+}
+
+function exportJSON() {
+    const blob = prepareJSON();
+    downloadBlob(blob);
+}
+
+function exportLRC() {
+    const blob = prepareLRC();
+    downloadBlob(blob, 'lrc');
+}
+
+function exportELRC() {
+    const blob = prepareELRC();
+    downloadBlob(blob, 'lrc');
+}
+
+function downloadBlob(blob, format = 'json') {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
 
     a.href = url;
-    a.download = filename + '.lrc';
+    a.download = filename + '.' + format;
     a.click();
+}
+
+function exportKMAKE() {
+    var zip = new JSZip();
+
+    // add music
+    zip.file("audiofile.kmakefile", music_file);
+
+    // add lyrics
+    let jsonLyrics = prepareJSON();
+    zip.file("lyrics.kmakefile", jsonLyrics);
+
+    const options = { 
+        type: 'blob',
+        mimeType: 'application/kmake',
+    };
+
+    // export
+    zip.generateAsync(options).then(function (content) {
+        downloadBlob(content, 'kmake');
+    });
+}
+
+function importKMAKE() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.kmake';
+    input.onchange = e => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = readerEvent => {
+                const content = readerEvent.target.result;
+                JSZip.loadAsync(content).then(function (zip) {
+                    // get music
+                    zip.file("audiofile.kmakefile").async("blob").then(function (content) {
+                        const file = new File([content], 'audiofile.mp3');
+                        
+                        // create filelist
+                        const fileList = new DataTransfer();
+                        fileList.items.add(file);
+
+                        // set music
+                        elem_musicInput.files = fileList.files;
+                        elem_musicInput.dispatchEvent(new Event('change'));
+                    });
+
+                    // get lyrics
+                    zip.file("lyrics.kmakefile").async("string").then(function (content) {
+                        const file = new File([content], 'lyrics.json');
+
+                        // create filelist
+                        const fileList = new DataTransfer();
+                        fileList.items.add(file);
+
+                        // set lyrics
+                        importJSON(fileList.files);
+                    });
+                });
+            }
+        }
+    }
+    input.click();
 }
 
 // shortcuts
@@ -515,6 +602,8 @@ elem_musicInput.addEventListener('change', function() {
     const file = this.files[0];
     const objectURL = URL.createObjectURL(file);
     elem_musicPlayer.src = objectURL;
+
+    music_file = file;
 
     // remove extension from filename
     filename = file.name.split('.').slice(0, -1).join('.');
