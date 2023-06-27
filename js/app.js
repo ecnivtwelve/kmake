@@ -745,3 +745,21 @@ document.getElementById('properties-preview').addEventListener('click', function
 window.addEventListener('load', function() {
     document.getElementById('loading').style.display = 'none';
 });
+
+// dropdown
+tippy('#export-drop', {
+    content: `
+        <div id="export-dropdown" class="dropdown-content">
+            <button onclick="exportJSON()" id="json-button">Export as JSON</button>
+            <button onclick="exportLRC()" id="lrc-button">Export as LRC</button>
+            <button onclick="exportELRC()" id="lrc-button">Export as eLRC</button>
+        </div>
+    `,
+    allowHTML: true,
+    trigger: 'click',
+    interactive: true,
+    animation: 'fade',
+    arrow: false,
+    theme: 'kmake-dropdown',
+    placement: 'bottom-start',
+});

@@ -92,9 +92,9 @@
                     </div>
                     <div class="inner-part-buttons buttons-top">
                         <button onclick="nextWord()" id="nextword-button">Next word <span>(Enter)</span></button>
-                        <button onclick="exportJSON()" id="json-button">Export as JSON</button>
-                        <button onclick="exportLRC()" id="lrc-button">Export as LRC</button>
-                        <button onclick="exportELRC()" id="lrc-button">Export as eLRC</button>
+
+                        <button id="export-drop">Export as <i data-lucide="chevron-down"></i></button>
+
                         <button id="preview-mode" onclick="previewToggle()" id="json-button">Preview mode</button>
                     </div>
                     <div id="lyrics-content" class="inner-part-content">
@@ -151,10 +151,16 @@
             </div>
         </div>
         
+        <script src="https://unpkg.com/@popperjs/core@2"></script>
+        <script src="https://unpkg.com/tippy.js@6"></script>
         <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
         <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js" integrity="sha512-Eezs+g9Lq4TCCq0wae01s9PuNWzHYoCMkE97e2qdkYthpI0pzC3UGB03lgEHn2XM85hDOUF6qgqqszs+iXU4UA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <script>
+            lucide.createIcons();
+        </script>
         <script src="js/app.js" async defer></script>
     </body>
 </html>

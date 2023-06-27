@@ -73,6 +73,7 @@ body {
     app-region: no-drag !important;
 }
 
+
 #header .buttons-actions button:hover {
     background: #333;
 }
@@ -185,6 +186,13 @@ body {
     padding: 0 12px;
     cursor: pointer;
     height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.inner-part-buttons button svg {
+    opacity: 0.5;
+    height: 20px;
 }
 
 .inner-part-buttons button:hover {
@@ -597,4 +605,38 @@ button.enabled {
         stroke-dasharray: 89,200;
         stroke-dashoffset: -124;
     }
+}
+
+.dropdown-content {
+    display: flex;
+    flex-direction: column;
+
+    background: #333;
+    border: 1px solid #555;
+
+    gap: 0px;
+    padding: 0;
+
+    width: 150px;
+}
+
+.dropdown-content button {
+    background: #333;
+    border-bottom: 1px solid #555;
+    color: #fff;
+    padding: 6px 11px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dropdown-content button:last-child {
+    border-bottom: none;
+}
+
+.tippy-box[data-theme~='kmake-dropdown'] {
+    margin-top: -5px;
+}
+
+.tippy-box[data-theme~='kmake-dropdown'] .tippy-content {
+    padding: 0;
 }
