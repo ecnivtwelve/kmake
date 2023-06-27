@@ -88,12 +88,15 @@ function reset() {
 }
 
 function importSong() {
+    elem_musicInput.type = 'file';
+    elem_musicInput.accept = '.mp3, .wav, .ogg, .flac, .m4a, .mp4';
     elem_musicInput.click();
 }
 
 function importJSON(files) {
     var input = document.createElement('input');
     input.type = 'file';
+    input.accept = '.json';
 
     if(!files) {
         input.click();
