@@ -262,6 +262,10 @@ button.enabled {
     border: 1px solid #555;
 }
 
+.music-data-text {
+    width: calc(100% - 72px - 12px);
+}
+
 .music-data-text p {
     width: 100%;
     overflow: hidden;
