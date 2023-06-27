@@ -203,8 +203,8 @@ button.enabled {
 
 /* music */
 .inner-music {
-    height: 300px;
-    max-height: 300px !important;
+    height: 290px;
+    max-height: 290px !important;
 }
 
 .music-inner {
@@ -229,6 +229,9 @@ button.enabled {
     display: flex;
     gap: 12px;
     align-items: center;
+
+    width: 100%;
+    overflow: hidden;
 }
 
 #music-album-art {
@@ -243,11 +246,21 @@ button.enabled {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    width: calc(100% - 12px * 2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .music-data-text #music-title {
     font-size: 1.2em;
     font-weight: 600;
+
+    width: calc(100% - 12px * 2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .music-data-text #music-album {
