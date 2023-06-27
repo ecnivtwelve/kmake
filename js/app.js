@@ -12,7 +12,7 @@ let played_word = ''; // word that is currently being played
 let music_file = null; // music file
 
 // dom elements
-const elem_part_sortable = document.getElementsByClassName('part');
+const elem_part_sortable = document.getElementsByClassName('part-sortable');
 const elem_musicInput = document.getElementById('music-input');
 const elem_musicPlayer = document.getElementById('music-player');
 const elem_lyricsInput = document.getElementById('lyrics-input');
