@@ -21,6 +21,10 @@ const elem_lyricsContent = document.getElementById('lyrics-content');
 // plyr
 const player = new Plyr(elem_musicPlayer, {
     controls: ['play', 'progress', 'current-time', 'mute', 'settings'],
+    speed: {
+        selected: 1,
+        options: [0.5, 0.75, 1, 1.5]
+    }
 });
 
 // sortable
