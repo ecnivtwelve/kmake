@@ -106,6 +106,18 @@ body {
     height: calc(100vh - 10px * 2);
 }
 
+.part-left:not(:has(> *)) {
+    position: absolute;
+    left: 0;
+    pointer-events: none;
+}
+
+.part-right:not(:has(> *)) {
+    position: absolute;
+    right: 0;
+    pointer-events: none;
+}
+
 .part-left {
     width: 360px;
     min-width: 360px;
@@ -211,8 +223,8 @@ button.enabled {
 
 /* music */
 .inner-music {
-    height: 290px;
-    max-height: 290px !important;
+    height: 215px;
+    max-height: 215px !important;
 }
 
 .music-inner {
@@ -390,6 +402,17 @@ button.enabled {
     cursor: default;
     user-select: none;
     color: #fff; 
+    display: inline-block;
+
+    padding: 1px 4px;
+    margin: -1px -4px;
+
+    border-radius: 3px;
+}
+
+.lyrics-line {
+    display: flex;
+    gap: 5px !important;
 }
 
 .lyrics-word.lyrics-space {
@@ -404,13 +427,16 @@ button.enabled {
 
 .lyrics-word:hover {
     border: 1px dotted #fff;
+    background: #444;
+    color: #999;
+    box-shadow: 0 1px 2px #00000099;
 }
 
 .current-word {
     color: red;
     border: 1px dotted red;
 
-    animation: current-word 0.3s;
+    animation: playing-word 0.15s ease-out;
 }
 
 .done-word {
@@ -419,7 +445,33 @@ button.enabled {
 
 .playing-word {
     background: lime;
-    color: #000;
+    color: #000 !important;
+
+    box-shadow: 0 1px 2px #00000099;
+
+    animation: playing-word 0.15s ease-out;
+}
+
+.playing-word:hover {
+    background: rgb(0, 209, 0) !important;
+    color: #000 !important;
+
+    outline: 1px dashed #fff;
+
+    text-shadow: none;
+}
+
+@keyframes playing-word {
+    from {
+        padding: 2px 7px;
+        margin: -2px -7px;
+
+        padding-left: 9px;
+        padding-right: 2px;
+
+        margin-left: -9px;
+        margin-right: -2px;
+    }
 }
 
 .opened-word {
@@ -430,6 +482,7 @@ button.enabled {
 .playing-word.opened-word {
     background: lime !important;
     color: #000 !important;
+    text-shadow: none;
 }
 
 .past-word {
@@ -477,7 +530,7 @@ button.enabled {
 
 #lyrics-content.preview .playing-line {
     z-index: 999;
-    display: block;
+    display: flex;
 
     position: absolute;
     top: calc(0px + var(--offset-y));
@@ -501,7 +554,7 @@ button.enabled {
 
 #lyrics-content.preview .next-playing-line {
     z-index: 0;
-    display: block;
+    display: flex;
 
     position: absolute;
     top: calc(30px + var(--offset-y));

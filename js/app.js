@@ -487,6 +487,8 @@ function importKMAKE() {
     input.type = 'file';
     input.accept = '.kmake';
     input.onchange = e => {
+        reset();
+
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
