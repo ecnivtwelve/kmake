@@ -404,10 +404,8 @@ button.enabled {
     color: #fff; 
     display: inline-block;
 
-    padding: 1px 4px;
-    margin: -1px -4px;
-
-    border-radius: 3px;
+    padding: 0.5px 3px;
+    margin: -0.5px -3px;
 }
 
 .lyrics-line {
@@ -429,14 +427,11 @@ button.enabled {
     border: 1px dotted #fff;
     background: #444;
     color: #999;
-    box-shadow: 0 1px 2px #00000099;
 }
 
 .current-word {
     color: red;
     border: 1px dotted red;
-
-    animation: playing-word 0.15s ease-out;
 }
 
 .done-word {
@@ -446,10 +441,6 @@ button.enabled {
 .playing-word {
     background: lime;
     color: #000 !important;
-
-    box-shadow: 0 1px 2px #00000099;
-
-    animation: playing-word 0.15s ease-out;
 }
 
 .playing-word:hover {
