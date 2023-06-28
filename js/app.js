@@ -291,7 +291,7 @@ function nextWord() {
     currentLyrics.push({
         time: parseInt(time.toFixed(0)),
         duration: 0,
-        text: currentWord.innerText,
+        text: currentWord.innerHTML,
         isLineEnding: isLastWord,
         element: currentWord
     });
@@ -407,10 +407,13 @@ function prepareJSON() {
                 isLineEnding = 1;
             }
 
+            let wordId = parseInt(word.id.split('-')[1]);
+            let wordLyr = currentLyrics[wordId];
+
             exportedLyrics.push({
                 time: lastTime,
                 duration: 0,
-                text: word.innerText,
+                text: wordLyr.text,
                 isLineEnding: isLineEnding,
             });
         }
