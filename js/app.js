@@ -287,11 +287,16 @@ function nextWord() {
         isLastWord = 1;
     }
 
+    let wordText = currentWord.innerHTML;
+    if(isLastWord) {
+        wordText = wordText.trim();
+    }
+
     // add current word to currentLyrics
     currentLyrics.push({
         time: parseInt(time.toFixed(0)),
         duration: 0,
-        text: currentWord.innerHTML,
+        text: wordText,
         isLineEnding: isLastWord,
         element: currentWord
     });
